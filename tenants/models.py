@@ -47,6 +47,24 @@ class Tenant(models.Model):
     state = models.CharField("UF", max_length=2, blank=True)
     postal_code = models.CharField("CEP", max_length=10, blank=True)
     notes = models.TextField("observações internas", blank=True)
+    wireguard_ip = models.GenericIPAddressField(
+        "IP WireGuard",
+        protocol="IPv4",
+        null=True,
+        blank=True,
+        help_text="Endereço IP atribuído ao roteador do cliente na VPN (ex: 10.10.0.2).",
+    )
+    wireguard_public_key = models.CharField(
+        "Chave Pública WireGuard",
+        max_length=64,
+        blank=True,
+        help_text="Chave pública do peer WireGuard no roteador MikroTik.",
+    )
+    wireguard_enabled = models.BooleanField(
+        "WireGuard ativado",
+        default=False,
+        help_text="Marque se este estabelecimento possui túnel WireGuard configurado e ativo.",
+    )
     slug = models.CharField(
         "subdomínio",
         max_length=63,
