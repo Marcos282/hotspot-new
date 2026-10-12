@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Painel | {{ tenant.name }}</title>
+  </head>
+  <body>
+    <main>
+      <h1>{{ tenant.name }}</h1>
+      <p>Painel do estabelecimento</p>
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">Sair</button>
+      </form>
+    </main>
+  </body>
+</html>

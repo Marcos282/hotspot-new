@@ -1,0 +1,241 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#080d1a">
+    <meta name="description" content="Nova Info: gestão de Wi-Fi para empresas com Hotspot MikroTik, portal cativo personalizado, acesso remoto seguro e inteligência de rede.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Nova Info — Wi-Fi que trabalha pelo seu negócio">
+    <meta property="og:description" content="Uma nova experiência de Wi-Fi para o seu estabelecimento. Conheça a plataforma Nova Info.">
+    <meta property="og:url" content="https://novainfo.com.br/">
+    <link rel="icon" type="image/svg+xml" href="{% static 'site/favicon.svg' %}">
+    <title>Nova Info — Wi-Fi que trabalha pelo seu negócio</title>
+    <link rel="canonical" href="https://novainfo.com.br/">
+    <link rel="stylesheet" href="{% static 'site/site.css' %}">
+    <script src="{% static 'site/site.js' %}" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <a class="brand" href="#inicio" aria-label="Nova Info, página inicial">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 40 40" fill="none"><path d="M7 16.5a19 19 0 0 1 26 0M12 22a12 12 0 0 1 16 0m-11 5.5a4 4 0 0 1 6 0M20 33h.01" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><circle cx="20" cy="20" r="18" stroke="currentColor" stroke-opacity=".28"/></svg>
+          </span>
+          <span class="brand-name">nova<span>info</span></span>
+        </a>
+        <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="main-nav">
+          <span></span><span></span><span></span>
+        </button>
+        <nav class="main-nav" id="main-nav" aria-label="Navegação principal">
+          <a href="#solucoes">Soluções</a>
+          <a href="#como-funciona">Como funciona</a>
+          <a href="#privacidade">Privacidade</a>
+          <a class="nav-cta" href="#contato">Solicitar demonstração <span aria-hidden="true">↗</span></a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="conteudo">
+      <section class="hero section-grid" id="inicio">
+        <div class="hero-glow" aria-hidden="true"></div>
+        <div class="container hero-layout">
+          <div class="hero-copy">
+            <div class="eyebrow"><span class="pulse-dot"></span> CONECTIVIDADE COM INTELIGÊNCIA</div>
+            <h1>Wi-Fi que trabalha <span>pelo seu negócio.</span></h1>
+            <p class="hero-lead">Uma plataforma para transformar a conexão dos seus clientes em uma experiência com a sua marca — e dar a você mais controle sobre a rede.</p>
+            <div class="hero-actions">
+              <a class="button button-primary" href="#contato">Quero conhecer <span aria-hidden="true">→</span></a>
+              <a class="button button-quiet" href="#solucoes"><span class="play-icon" aria-hidden="true">⌄</span> Explorar soluções</a>
+            </div>
+            <div class="hero-proof">
+              <div class="proof-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M12 3 4.5 6v5.2c0 4.6 3.2 8.8 7.5 9.8 4.3-1 7.5-5.2 7.5-9.8V6L12 3Z" stroke="currentColor" stroke-width="1.5"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <p><strong>Feita para redes reais.</strong><br>Com segurança, visibilidade e suporte ao ecossistema MikroTik.</p>
+            </div>
+          </div>
+
+          <div class="product-visual" aria-label="Ilustração conceitual da futura plataforma Nova Info">
+            <div class="visual-orbit orbit-one"></div>
+            <div class="visual-orbit orbit-two"></div>
+            <div class="dashboard-card">
+              <div class="dashboard-top">
+                <div class="mini-brand"><span class="mini-brand-mark">N</span><span>nova<span>info</span></span></div>
+                <span class="preview-tag"><i></i> PRÉVIA CONCEITUAL</span>
+              </div>
+              <div class="dashboard-heading">
+                <div><span class="dash-kicker">VISÃO DA REDE</span><h2>Seu Wi-Fi. Um só lugar.</h2></div>
+                <button class="dots-button" aria-label="Mais opções" type="button">···</button>
+              </div>
+              <div class="metric-grid">
+                <div class="metric-card">
+                  <span class="metric-label">Equipamentos</span>
+                  <div class="metric-main"><span class="metric-symbol router-symbol">⌁</span><span>Centralizados</span></div>
+                  <span class="metric-caption">Gestão em um painel</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-label">Acesso remoto</span>
+                  <div class="metric-main"><span class="metric-symbol secure-symbol">⌑</span><span>Protegido</span></div>
+                  <span class="metric-caption">Conexão via WireGuard</span>
+                </div>
+              </div>
+              <div class="chart-card">
+                <div class="chart-head"><div><span class="metric-label">EXPERIÊNCIA DO CLIENTE</span><p>Portal cativo personalizado</p></div><span class="chart-badge">SUA MARCA</span></div>
+                <div class="chart-area" aria-hidden="true">
+                  <div class="chart-lines"><i></i><i></i><i></i></div>
+                  <svg viewBox="0 0 460 120" preserveAspectRatio="none"><defs><linearGradient id="chartFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#45d9ff" stop-opacity=".25"/><stop offset="100%" stop-color="#45d9ff" stop-opacity="0"/></linearGradient></defs><path d="M0 94 C35 89 45 67 83 74 S133 100 169 69 222 73 254 49 303 58 336 40 383 51 410 20 442 29 460 8 V120 H0Z" fill="url(#chartFill)"/><path d="M0 94 C35 89 45 67 83 74 S133 100 169 69 222 73 254 49 303 58 336 40 383 51 410 20 442 29 460 8" fill="none" stroke="#4bd8fa" stroke-width="2.5" vector-effect="non-scaling-stroke"/></svg>
+                </div>
+                <div class="chart-foot"><span>Um painel pensado para você</span><span class="chart-status"><i></i> VISÃO ILUSTRATIVA</span></div>
+              </div>
+              <div class="dashboard-footer"><span><i></i> HOTSPOT MIKROTIK</span><span>CONTROLE · EXPERIÊNCIA · INSIGHTS</span></div>
+            </div>
+            <div class="float-chip chip-wifi"><span>⌁</span> Hotspot com a sua marca</div>
+            <div class="float-chip chip-lock"><span>⌑</span> Acesso remoto seguro</div>
+          </div>
+        </div>
+        <div class="container hero-bottom"><span>TECNOLOGIA PARA CONECTAR PESSOAS E NEGÓCIOS</span><div class="scroll-cue"><span></span> ROLE PARA DESCOBRIR</div></div>
+      </section>
+
+      <section class="trust-strip" aria-label="Tecnologias e foco">
+        <div class="container trust-content">
+          <span class="trust-label">UM ECOSSISTEMA CONECTADO</span>
+          <div class="tech-list"><span class="tech-word">Mikro<span>tik</span></span><i></i><span class="tech-word wireguard-word">Wire<span>Guard</span></span><i></i><span class="tech-word radius-word">RADIUS</span><i></i><span class="tech-word">Wi-Fi <span>Guest</span></span></div>
+        </div>
+      </section>
+
+      <section class="section solutions-section" id="solucoes">
+        <div class="container">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow eyebrow-dark"><span class="eyebrow-line"></span> UMA PLATAFORMA. VÁRIAS POSSIBILIDADES.</div>
+              <h2>Mais do que oferecer Wi-Fi.<br><span>Uma experiência melhor.</span></h2>
+            </div>
+            <p>A Nova Info está sendo desenvolvida para simplificar o gerenciamento da rede e ajudar seu estabelecimento a aproveitar melhor cada conexão.</p>
+          </div>
+          <div class="services-grid">
+            <article class="service-card service-feature">
+              <div class="service-icon cyan-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 9a14 14 0 0 1 18 0M6.5 12.5a9 9 0 0 1 11 0M10 16a3.5 3.5 0 0 1 4 0M12 20h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+              <span class="service-index">01 / EXPERIÊNCIA</span>
+              <h3>Portal cativo com a sua identidade</h3>
+              <p>Apresente sua marca, uma mensagem de boas-vindas e campanhas na página de acesso ao Wi-Fi.</p>
+              <a href="#como-funciona" class="text-link">Entenda a experiência <span>→</span></a>
+              <div class="portal-preview" aria-hidden="true"><div class="portal-preview-bar"><i></i><i></i><i></i></div><div class="portal-preview-content"><span class="portal-logo">SEU<br>LOGO</span><span class="portal-lines"><i></i><i></i><b>ACESSAR WI-FI</b></span></div></div>
+            </article>
+            <article class="service-card">
+              <div class="service-icon violet-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 9h8M8 13h3m3 0h2M8 16h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+              <span class="service-index">02 / GESTÃO</span>
+              <h3>Seus MikroTiks em um só painel</h3>
+              <p>Organize equipamentos, acompanhe disponibilidade e tenha uma visão centralizada da operação.</p>
+              <span class="service-footnote">Conforme modelo e versão do RouterOS</span>
+            </article>
+            <article class="service-card">
+              <div class="service-icon green-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 4.5 6v5.2c0 4.6 3.2 8.8 7.5 9.8 4.3-1 7.5-5.2 7.5-9.8V6L12 3Z" stroke="currentColor" stroke-width="1.6"/><path d="M9 12h6M12 9v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+              <span class="service-index">03 / CONECTIVIDADE</span>
+              <h3>Acesso remoto protegido</h3>
+              <p>Planejamento de conectividade com WireGuard para gerenciar roteadores sem expor a API à internet pública.</p>
+              <span class="service-footnote">VPN não substitui Hotspot nem RADIUS</span>
+            </article>
+            <article class="service-card">
+              <div class="service-icon orange-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 6.5h14v11H5zM8 10h8M8 13h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="m16 16 2 2 3-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span class="service-index">04 / ACESSO</span>
+              <h3>Autenticação e sessões</h3>
+              <p>Preparação para integrar Hotspot e FreeRADIUS, com modalidades de acesso e acompanhamento de sessões.</p>
+              <span class="service-footnote">Dados baseados em integrações ativas</span>
+            </article>
+            <article class="service-card">
+              <div class="service-icon pink-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16v14H4zM4 9h16M8 5v4m8-4v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="m8 14 2.5 2.5L16 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span class="service-index">05 / COMUNICAÇÃO</span>
+              <h3>Campanhas no portal Wi-Fi</h3>
+              <p>Divulgue ofertas, cupons e novidades na jornada de conexão, com métricas apenas do que puder ser medido.</p>
+              <span class="service-footnote">Marketing opcional, sem bloquear o acesso</span>
+            </article>
+            <article class="service-card">
+              <div class="service-icon blue-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 19V5m0 14h16M7 15l4-4 3 2 5-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19" cy="7" r="1.5" fill="currentColor"/></svg></div>
+              <span class="service-index">06 / VISIBILIDADE</span>
+              <h3>Indicadores para decidir melhor</h3>
+              <p>Visualize conexões, disponibilidade e tendências em painéis claros, a partir dos dados recebidos da sua rede.</p>
+              <span class="service-footnote">Sem métricas inventadas ou dados simulados</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="workflow-section" id="como-funciona">
+        <div class="container workflow-layout">
+          <div class="workflow-copy">
+            <div class="eyebrow"><span class="eyebrow-line"></span> SIMPLES PARA VOCÊ. INTELIGENTE POR TRÁS.</div>
+            <h2>Da rede à experiência.<br><span>Sem complicar.</span></h2>
+            <p>Uma jornada pensada para o seu estabelecimento, com configuração acompanhada e recursos adequados à sua infraestrutura.</p>
+            <a class="button button-primary" href="#contato">Planejar minha rede <span aria-hidden="true">→</span></a>
+          </div>
+          <div class="steps-list">
+            <article class="step-item"><span class="step-number">01</span><div><h3>Conhecemos sua estrutura</h3><p>Entendemos seu MikroTik, a cobertura Wi-Fi e o que você quer oferecer aos visitantes.</p></div><span class="step-connector"></span></article>
+            <article class="step-item"><span class="step-number">02</span><div><h3>Planejamos a conexão segura</h3><p>Avaliamos como integrar o equipamento e quais recursos são compatíveis com sua rede.</p></div><span class="step-connector"></span></article>
+            <article class="step-item"><span class="step-number">03</span><div><h3>Personalizamos a experiência</h3><p>Construímos um portal alinhado à identidade do estabelecimento e às suas regras de acesso.</p></div><span class="step-connector"></span></article>
+            <article class="step-item"><span class="step-number">04</span><div><h3>Acompanhamos a operação</h3><p>Consulte equipamentos e sessões no painel conforme conectividade e integrações disponíveis.</p></div></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="privacy-section" id="privacidade">
+        <div class="container privacy-panel">
+          <div class="privacy-symbol" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none"><path d="M32 6 10 15v15c0 13.5 9.4 25.7 22 28 12.6-2.3 22-14.5 22-28V15L32 6Z" stroke="currentColor" stroke-width="1.6"/><path d="m23 31 6 6 13-14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="32" cy="32" r="26" stroke="currentColor" stroke-opacity=".15"/></svg><span></span></div>
+          <div class="privacy-copy">
+            <div class="eyebrow"><span class="eyebrow-line"></span> PRIVACIDADE DESDE O PROJETO</div>
+            <h2>Tecnologia que respeita<br><span>quem se conecta.</span></h2>
+            <p>Recursos de transparência, controle de acesso a dados e apoio à gestão de privacidade fazem parte da visão da Nova Info. A plataforma não garante conformidade legal: cada operação deve avaliar suas responsabilidades e definir seus procedimentos.</p>
+            <a class="text-link light-link" href="#contato">Vamos conversar sobre segurança <span>→</span></a>
+          </div>
+          <div class="privacy-points"><span><i></i> Dados com propósito</span><span><i></i> Acesso controlado</span><span><i></i> Consentimento opcional</span></div>
+        </div>
+      </section>
+
+      <section class="contact-section" id="contato">
+        <div class="contact-glow" aria-hidden="true"></div>
+        <div class="container contact-layout">
+          <div class="contact-copy">
+            <div class="eyebrow"><span class="pulse-dot"></span> SUA PRÓXIMA CONEXÃO COMEÇA AQUI</div>
+            <h2>Vamos conversar sobre<br><span>o Wi-Fi do seu negócio?</span></h2>
+            <p>Conte um pouco sobre seu estabelecimento. A equipe Nova Info poderá entender seu cenário e apresentar os próximos passos.</p>
+            <div class="contact-assurance"><span class="assurance-check">✓</span><span>Sem compromisso. Seus dados serão usados para responder a esta solicitação.</span></div>
+          </div>
+          <form class="contact-form" method="post" action="{% url 'demo-request' %}">
+            {% csrf_token %}
+            {% for message in messages %}
+              <div class="form-message {{ message.tags }}" role="status">{{ message }}</div>
+            {% endfor %}
+            <div class="form-heading"><span class="form-label">FALE COM A NOVA INFO</span><span class="form-step">01 <i>/</i> 01</span></div>
+            <div class="form-row">
+              <label>Seu nome<input type="text" name="name" autocomplete="name" placeholder="Como podemos chamar você?" required maxlength="120"></label>
+              <label>Estabelecimento<input type="text" name="business_name" autocomplete="organization" placeholder="Nome do negócio" required maxlength="150"></label>
+            </div>
+            <div class="form-row">
+              <label>E-mail<input type="email" name="email" autocomplete="email" placeholder="voce@empresa.com.br" required maxlength="254"></label>
+              <label>WhatsApp <span class="optional-label">opcional</span><input type="tel" name="phone" autocomplete="tel" placeholder="(00) 00000-0000" maxlength="32"></label>
+            </div>
+            <label>O que você gostaria de melhorar?<textarea name="message" rows="3" placeholder="Conte sobre sua rede ou o que procura..." maxlength="1000"></textarea></label>
+            <label class="honeypot" aria-hidden="true">Não preencha este campo<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+            <button class="button button-primary form-submit" type="submit">Solicitar conversa <span aria-hidden="true">→</span></button>
+            <p class="form-privacy">Ao enviar, você solicita contato da Nova Info. Não é necessário aceitar marketing para receber uma resposta.</p>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-main">
+        <div class="footer-brand">
+          <a class="brand" href="#inicio" aria-label="Nova Info, voltar ao início"><span class="brand-mark"><svg viewBox="0 0 40 40" fill="none"><path d="M7 16.5a19 19 0 0 1 26 0M12 22a12 12 0 0 1 16 0m-11 5.5a4 4 0 0 1 6 0M20 33h.01" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><circle cx="20" cy="20" r="18" stroke="currentColor" stroke-opacity=".28"/></svg></span><span class="brand-name">nova<span>info</span></span></a>
+          <p>Conectividade mais inteligente para negócios que recebem pessoas.</p>
+        </div>
+        <div class="footer-links"><span>EXPLORE</span><a href="#solucoes">Soluções</a><a href="#como-funciona">Como funciona</a><a href="#privacidade">Privacidade</a></div>
+        <div class="footer-links"><span>FALE COM A GENTE</span><a href="#contato">Solicitar demonstração <i>↗</i></a><a href="/accounts/login/">Acesso do cliente <i>↗</i></a></div>
+        <a class="back-top" href="#inicio" aria-label="Voltar ao topo">↑</a>
+      </div>
+      <div class="container footer-bottom"><span>© {% now "Y" %} Nova Info. Todos os direitos reservados.</span><span>TECNOLOGIA COM CONEXÃO HUMANA <i>✳</i></span></div>
+    </footer>
+  </body>
+</html>

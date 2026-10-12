@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Entrar | Nova Info</title>
+  </head>
+  <body>
+    <main>
+      <h1>Entrar na Nova Info</h1>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="hidden" name="next" value="{{ next }}">
+        <button type="submit">Entrar</button>
+      </form>
+    </main>
+  </body>
+</html>
