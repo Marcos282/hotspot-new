@@ -10,9 +10,66 @@ class TenantMembershipInline(admin.TabularInline):
 
 @admin.register(Tenant)
 class TenantAdmin(admin.ModelAdmin):
-    list_display = ("name", "slug", "is_active", "created_at")
-    list_filter = ("is_active",)
-    search_fields = ("name", "slug")
+    list_display = (
+        "name",
+        "slug",
+        "responsible_name",
+        "phone",
+        "email",
+        "is_active",
+        "created_at",
+    )
+    list_filter = ("is_active", "state", "created_at")
+    search_fields = (
+        "name",
+        "legal_name",
+        "slug",
+        "document_number",
+        "responsible_name",
+        "email",
+        "phone",
+    )
+    fieldsets = (
+        (
+            "Identificação do Estabelecimento",
+            {
+                "fields": (
+                    "name",
+                    "legal_name",
+                    "document_number",
+                    "slug",
+                    "is_active",
+                )
+            },
+        ),
+        (
+            "Contato e Responsável",
+            {
+                "fields": (
+                    "responsible_name",
+                    "email",
+                    "phone",
+                )
+            },
+        ),
+        (
+            "Endereço e Localização",
+            {
+                "fields": (
+                    "address",
+                    "city",
+                    "state",
+                    "postal_code",
+                )
+            },
+        ),
+        (
+            "Notas e Informações Internas",
+            {
+                "fields": ("notes",),
+            },
+        ),
+    )
     inlines = (TenantMembershipInline,)
 
 

@@ -26,7 +26,27 @@ tenant_slug_validator = RegexValidator(
 
 
 class Tenant(models.Model):
-    name = models.CharField("nome", max_length=150)
+    name = models.CharField("nome fantasia / estabelecimento", max_length=150)
+    legal_name = models.CharField(
+        "razão social", max_length=200, blank=True, help_text="Razão social jurídica ou nome completo do responsável."
+    )
+    document_number = models.CharField(
+        "CNPJ / CPF", max_length=20, blank=True, help_text="CNPJ ou CPF do titular do estabelecimento."
+    )
+    email = models.EmailField(
+        "e-mail de contato", blank=True, help_text="E-mail principal para contato e notificações."
+    )
+    phone = models.CharField(
+        "telefone / WhatsApp", max_length=32, blank=True, help_text="Telefone ou WhatsApp de contato comercial/técnico."
+    )
+    responsible_name = models.CharField(
+        "nome do responsável", max_length=120, blank=True, help_text="Nome do titular ou contato responsável."
+    )
+    address = models.CharField("endereço completo", max_length=255, blank=True)
+    city = models.CharField("cidade", max_length=100, blank=True)
+    state = models.CharField("UF", max_length=2, blank=True)
+    postal_code = models.CharField("CEP", max_length=10, blank=True)
+    notes = models.TextField("observações internas", blank=True)
     slug = models.CharField(
         "subdomínio",
         max_length=63,
