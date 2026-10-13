@@ -1,0 +1,6 @@
+{% extends 'operations/base.html' %}{% block central %}
+<p>Usuário: <strong>{{ account_user.username }}</strong> · {{ account_user.email }}</p>
+<p>Confira a identidade do responsável e escolha o estabelecimento e a permissão. Esta aprovação concede acesso ao painel desse estabelecimento.</p>
+<form method="post">{% csrf_token %}{{ form.as_p }}<button class="button button-primary">Aprovar acesso</button></form>
+<p><a href="{% url 'accounts-panel' %}">Voltar ao controle de contas</a></p>
+{% endblock %}

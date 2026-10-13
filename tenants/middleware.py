@@ -20,7 +20,7 @@ class TenantMiddleware:
         request.platform_host = host_is_root
         central = bool(host_is_root and request.user.is_authenticated and request.user.is_active
                        and request.user.is_staff and request.user.has_perm('operations.manage_network')
-                       and (request.path.startswith('/central/') or request.path.startswith('/admin/')))
+                       and (request.path.startswith('/central/') or request.path.startswith('/admin/') or request.path.startswith('/accounts/painel/')))
         user_id = request.user.pk if request.user.is_authenticated else None
         with tenant_database_context(None, user_id, central=central):
             request.tenant = self.resolve_tenant(request)
@@ -36,6 +36,13 @@ class TenantMiddleware:
                 from django.db import connection
                 if connection.vendor == 'postgresql' and request.tenant_membership:
                     request.tenant = Tenant.objects.get(pk=request.tenant.pk)
+                # Protect every panel route, including future views that omit a mixin.
+                if request.path == '/painel' or request.path.startswith('/painel/'):
+                    if not request.user.is_authenticated:
+                        from django.contrib.auth.views import redirect_to_login
+                        return redirect_to_login(request.get_full_path())
+                    if not request.tenant_membership or not request.tenant.is_active:
+                        raise Http404
                 response = self.get_response(request)
                 if hasattr(response, 'render') and not response.is_rendered:
                     response.render()

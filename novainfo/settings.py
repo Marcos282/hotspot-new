@@ -135,3 +135,16 @@ if DEBUG and not ROUTEROS_CREDENTIAL_KEY and local_credential_key.is_file():
 WG_EXECUTABLE = os.environ.get('WG_EXECUTABLE', '/usr/bin/wg')
 WG_MONITOR_USER_ID = os.environ.get('WG_MONITOR_USER_ID', '')
 MONITOR_MAX_GAP_SECONDS = int(os.environ.get('MONITOR_MAX_GAP_SECONDS', '300'))
+
+WG_STATUS_FILE = os.environ.get('WG_STATUS_FILE', '/var/lib/novainfo/wireguard-status.json')
+
+# Authentication emails: credentials belong in the service environment.
+EMAIL_BACKEND = 'tenants.email_backend.EmailBackend'
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
+DEFAULT_FROM_EMAIL = os.environ.get('RESEND_FROM_EMAIL', '')
+PASSWORD_RESET_TIMEOUT = 3600
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_DOMAIN = None
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 3600

@@ -23,7 +23,7 @@ LABELS={'waiting':'Aguardando configuração','online':'Online','offline':'Offli
 
 
 def central_access(function):
-    @login_required(login_url='/central/login/')
+    @login_required(login_url='/accounts/painel/login/')
     @wraps(function)
     def protected(request,*args,**kwargs):
         if not getattr(request,'platform_host',False) or request.tenant is not None or not request.user.is_active or not request.user.is_staff or not request.user.has_perm('operations.manage_network'):
@@ -57,7 +57,9 @@ def dashboard(request):
     now=timezone.now()
     online=DeviceHealth.objects.filter(vpn_status='online',checked_at__gte=now-timedelta(minutes=5)).count()
     alerts=DeviceAlert.objects.filter(acknowledged_at__isnull=True).select_related('outage__device','tenant').order_by('-created_at')[:20]
-    return render(request,'operations/dashboard.html',context(request,'Central de controle',states=[state(device) for device in page],page_obj=page,tenant_count=Tenant.objects.count(),device_count=devices.count(),online_count=online,alerts=alerts,config=NetworkConfiguration.objects.filter(pk=1).first()))
+    from operations.server_status import wireguard_server_status
+    config=NetworkConfiguration.objects.filter(pk=1).first()
+    return render(request,'operations/dashboard.html',context(request,'Central de controle',states=[state(device) for device in page],page_obj=page,tenant_count=Tenant.objects.count(),device_count=devices.count(),online_count=online,alerts=alerts,config=config,wireguard_server=wireguard_server_status(config)))
 
 
 LISTS={

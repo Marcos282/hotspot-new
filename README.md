@@ -253,3 +253,58 @@ Registrar dinheiro não chama o Mercado Pago, não gera Pix e não autoriza o
 Hotspot automaticamente. O estabelecimento recebe e mantém essa receita. A
 Nova Info cobra somente sua assinatura mensal SaaS pelo Mercado Pago. O registro
 interno não substitui um documento fiscal. Não foram criadas vendas fictícias.
+
+
+## Instalação local do servidor WireGuard
+
+Execute `sudo bash deploy/install-wireguard.sh` no terminal local. O script
+instala wireguard-tools, cria wg0 em 10.77.0.1/24, inicia a unidade wg-quick e
+configura verificação de status a cada 60 segundos. Configurações existentes
+não são sobrescritas; rotas sobrepostas impedem a instalação. A chave privada
+fica somente em /etc/wireguard/wg0.conf, com acesso restrito ao root.
+
+O endpoint inicial é o IP LAN 192.168.6.132. Para usar outro host, passe-o como
+primeiro argumento do script. Acesso externo aos MikroTiks exige endpoint
+acessível e configuração de rede própria; não há abertura automática de firewall,
+NAT ou alteração de roteadores. O script não cadastra peers fictícios.
+
+A central indica o estado do servidor pelo arquivo público de status produzido
+pelo serviço root. O processo web não recebe privilégios de rede. Só indica
+Ativo se serviço, interface, chave pública, porta e IP corresponderem ao cadastro
+e a verificação tiver menos de três minutos. Peers e Hotspot mantêm seus estados
+independentes. A instalação não está concluída enquanto o comando sudo não for
+executado e validado no host.
+
+## Cadastro e recuperação de acesso
+
+`/accounts/cadastro/` cria uma conta com login, e-mail e senha, inicialmente
+inativa. A confirmação por e-mail vale por 24 horas e não cria associação nem
+concede acesso a estabelecimentos. Após confirmar, um administrador deve
+associar o usuário ao estabelecimento pela central/Admin, com o papel adequado.
+O cadastro não permite reivindicar um tenant existente digitando seu subdomínio.
+
+Configure `RESEND_API_KEY` e `RESEND_FROM_EMAIL` no ambiente do processo Django;
+o remetente deve pertencer a um domínio verificado no Resend. Reinicie o processo
+após configurar. Sem essas variáveis o envio não funciona; falhas no cadastro
+cancelam a criação da conta para permitir nova tentativa. Integração via
+[API oficial Resend](https://resend.com/docs/api-reference/emails/send-email).
+
+`/accounts/recuperar/` envia um link de uso único, válido por uma hora, para
+contas ativas. No subdomínio, somente membros ativos desse estabelecimento
+recebem o e-mail. A resposta de sucesso não informa se o endereço existe.
+Nunca se envia a senha anterior. O link permite definir uma senha nova.
+
+Todas as rotas `/painel/` exigem sessão autenticada e associação ativa. Sessões
+expiram em uma hora ou ao fechar o navegador e são restritas ao host. Uma sessão
+já autenticada dispensa redigitar a senha até expirar ou sair da conta.
+Login, cadastro e recuperação aceitam dez tentativas por IP/rota em 15 minutos.
+O cache padrão limita por processo; em produção com vários workers configure
+um backend de cache compartilhado e limites também no proxy. Configure HTTPS,
+`DJANGO_DEBUG=false` e uma secret key persistente externa para produção.
+
+A área administrativa de aprovação está em `/accounts/painel/`, no domínio
+principal, com login em `/accounts/painel/login/`. Exige usuário ativo, staff e
+`operations.manage_network`. Lista contas sem associação, bloqueia aprovação
+antes da ativação, permite escolher estabelecimento ativo e papel e registra
+quem aprovou na auditoria. Associações existentes são gerenciadas pelo link
+“Gerenciar acessos aprovados”. Clientes não acessam essa área.

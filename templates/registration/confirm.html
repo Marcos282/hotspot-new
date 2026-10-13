@@ -1,0 +1,1 @@
+{% extends 'site/base.html' %}{% load static %}{% block content %}<link rel="stylesheet" href="{% static 'site/panel.css' %}"><div class="account-card"><h1>Confirmar e-mail</h1><form method="post">{% csrf_token %}<button class="button button-primary">Confirmar minha conta</button></form><p><a href="{% url 'account' %}">Acessar minha conta</a></p></div>{% endblock %}
