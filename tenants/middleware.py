@@ -12,8 +12,38 @@ class TenantMiddleware:
         self.root_domain = settings.TENANT_ROOT_DOMAIN.lower().rstrip(".")
 
     def __call__(self, request):
-        request.tenant = self.resolve_tenant(request)
-        return self.get_response(request)
+        from tenants.checks import verify_runtime_database
+        verify_runtime_database()
+        from tenants.db_context import tenant_database_context
+        from tenants.models import TenantMembership
+        host_is_root = self.is_platform_host(request)
+        request.platform_host = host_is_root
+        central = bool(host_is_root and request.user.is_authenticated and request.user.is_active
+                       and request.user.is_staff and request.user.has_perm('operations.manage_network')
+                       and (request.path.startswith('/central/') or request.path.startswith('/admin/')))
+        user_id = request.user.pk if request.user.is_authenticated else None
+        with tenant_database_context(None, user_id, central=central):
+            request.tenant = self.resolve_tenant(request)
+            request.tenant_membership = None
+            if request.tenant and request.user.is_authenticated:
+                request.tenant_membership = TenantMembership.objects.filter(
+                    tenant=request.tenant, user=request.user, is_active=True
+                ).first()
+            with tenant_database_context(
+                request.tenant.pk if request.tenant_membership else None,
+                user_id, central=central,
+            ):
+                from django.db import connection
+                if connection.vendor == 'postgresql' and request.tenant_membership:
+                    request.tenant = Tenant.objects.get(pk=request.tenant.pk)
+                response = self.get_response(request)
+                if hasattr(response, 'render') and not response.is_rendered:
+                    response.render()
+                return response
+
+    def is_platform_host(self, request):
+        host = urlsplit(f"//{request.get_host()}").hostname.lower().rstrip('.')
+        return host == self.root_domain or not host.endswith('.'+self.root_domain) or host in {'www.'+self.root_domain,'gestao.'+self.root_domain,'admin.'+self.root_domain}
 
     def resolve_tenant(self, request):
         host = urlsplit(f"//{request.get_host()}").hostname
@@ -33,6 +63,14 @@ class TenantMiddleware:
         if subdomain in {"www", "gestao", "admin", "api", "static"}:
             return None
 
+        from django.db import connection
+        if connection.vendor == 'postgresql':
+            with connection.cursor() as cursor:
+                cursor.execute('SELECT id,name,slug,is_active FROM public.novainfo_resolve_tenant(%s)',[subdomain])
+                row=cursor.fetchone()
+            if row is None:
+                raise Http404
+            return Tenant(pk=row[0],name=row[1],slug=row[2],is_active=row[3])
         try:
             tenant = Tenant.objects.get(slug=subdomain, is_active=True)
         except Tenant.DoesNotExist:

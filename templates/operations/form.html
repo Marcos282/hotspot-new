@@ -1,0 +1,1 @@
+{% extends 'operations/base.html' %}{% block central %}{% if notice %}<div class="panel-notice">{{ notice }}</div>{% endif %}<form method="post" class="panel-form">{% csrf_token %}{{ form.as_p }}<button class="button button-primary">Salvar cadastro</button></form>{% endblock %}

@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, MinValueValidator
 from django.db import models
 
 
@@ -163,3 +163,94 @@ class TenantSettings(TenantOwnedModel):
 
     def __str__(self):
         return self.display_name or self.tenant.name
+
+
+class Device(TenantOwnedModel):
+    name = models.CharField("nome", max_length=120)
+    management_ip = models.GenericIPAddressField("IP de gerência privado")
+    routeros_version = models.CharField("versão RouterOS", max_length=32, blank=True)
+    enabled = models.BooleanField("habilitado", default=True)
+    last_seen = models.DateTimeField("última comunicação", null=True, blank=True)
+    api_username = models.CharField("usuário API somente leitura", max_length=80, blank=True)
+    api_password_encrypted = models.TextField(blank=True, editable=False)
+    certificate_sha256 = models.CharField("SHA-256 do certificado API-SSL", max_length=64, blank=True)
+    monitoring_enabled = models.BooleanField("monitoramento autorizado", default=False)
+    session_collection_enabled = models.BooleanField("coleta de sessões autorizada", default=False, help_text="Ative apenas após definir finalidade, base legal e retenção.")
+    privacy_purpose = models.CharField("finalidade/base legal documentada", max_length=500, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+class AccessPlan(TenantOwnedModel):
+    name = models.CharField("nome", max_length=100)
+    duration_minutes = models.PositiveIntegerField("duração em minutos", validators=[MinValueValidator(1)])
+    price = models.DecimalField("preço (R$)", max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    speed_limit = models.CharField("limite de velocidade", max_length=32, blank=True, help_text="Exemplo: 5M/10M. A aplicação ao roteador depende da integração.")
+    enabled = models.BooleanField("ativo", default=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Sale(TenantOwnedModel):
+    cash_request_id = models.UUIDField(null=True, blank=True, unique=True, editable=False)
+    duration_minutes = models.PositiveIntegerField("duração vendida (minutos)", null=True, blank=True)
+    plan = models.ForeignKey(AccessPlan, on_delete=models.PROTECT)
+    reference = models.CharField("referência", max_length=120)
+    amount = models.DecimalField("valor", max_digits=10, decimal_places=2)
+    status = models.CharField("situação", max_length=16, choices=[('pending', 'Pendente'), ('paid', 'Pago'), ('cancelled', 'Cancelado')], default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class Payment(TenantOwnedModel):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['tenant','provider_reference'], name='unique_tenant_payment_reference'),
+            models.UniqueConstraint(fields=['sale'], condition=models.Q(method='cash'), name='one_cash_payment_per_sale'),
+            models.CheckConstraint(condition=~models.Q(method='cash') | (models.Q(received_by__isnull=False) & models.Q(received_at__isnull=False) & models.Q(amount__gt=0) & models.Q(status='paid')), name='cash_payment_requires_receipt'),
+        ]
+
+    method = models.CharField("forma de recebimento", max_length=16, choices=[('cash','Dinheiro'),('legacy','Não informado (registro anterior)')], default='legacy')
+    received_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True, related_name='cash_receipts')
+    received_at = models.DateTimeField("recebido em", null=True, blank=True)
+    sale = models.ForeignKey(Sale, on_delete=models.PROTECT)
+    provider_reference = models.CharField(max_length=150)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class AccessSession(TenantOwnedModel):
+    router_session_id = models.CharField(max_length=120, blank=True, db_index=True)
+    device = models.ForeignKey(Device, on_delete=models.PROTECT)
+    username = models.CharField(max_length=120)
+    started_at = models.DateTimeField()
+    ended_at = models.DateTimeField(null=True, blank=True)
+    last_seen = models.DateTimeField(null=True, blank=True)
+    bytes_used = models.PositiveBigIntegerField(default=0)
+
+
+class HotspotConfiguration(TenantOwnedModel):
+    tenant = models.OneToOneField(Tenant, on_delete=models.CASCADE, related_name='hotspot')
+    title = models.CharField("título do portal", max_length=120, default='Bem-vindo ao nosso Wi-Fi')
+    welcome_text = models.TextField("mensagem de boas-vindas", blank=True, max_length=2000)
+    free_access = models.BooleanField("oferecer acesso gratuito", default=False)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class BrandImage(TenantOwnedModel):
+    kind = models.CharField("tipo", max_length=16, choices=[('logo', 'Logotipo'), ('advertisement', 'Publicidade')])
+    title = models.CharField("descrição", max_length=120)
+    data = models.BinaryField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class AuditEvent(TenantOwnedModel):
+    fields_changed = models.JSONField(default=list, blank=True)
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    action = models.CharField(max_length=80)
+    object_type = models.CharField(max_length=80)
+    object_id = models.PositiveBigIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+

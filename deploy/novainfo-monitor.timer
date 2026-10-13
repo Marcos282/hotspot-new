@@ -1,0 +1,11 @@
+[Unit]
+Description=Agendar verificacoes de rede Nova Info
+
+[Timer]
+OnBootSec=60
+OnUnitInactiveSec=60
+AccuracySec=5
+Unit=novainfo-monitor.service
+
+[Install]
+WantedBy=timers.target

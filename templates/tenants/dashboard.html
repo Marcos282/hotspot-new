@@ -1,18 +1,1 @@
-<!doctype html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Painel | {{ tenant.name }}</title>
-  </head>
-  <body>
-    <main>
-      <h1>{{ tenant.name }}</h1>
-      <p>Painel do estabelecimento</p>
-      <form method="post" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button type="submit">Sair</button>
-      </form>
-    </main>
-  </body>
-</html>
+{% extends 'tenants/base.html' %}{% block panel %}<h2>{{ tenant.name }}</h2><div class="panel-metrics"><article><span>Equipamentos cadastrados</span><strong>{{ device_count }}</strong></article><article><span>Planos de acesso</span><strong>{{ plan_count }}</strong></article><article><span>Usuários com sinal recente</span><strong>{{ online_count }}</strong></article><article><span>Vendas registradas</span><strong>{{ sale_count }}</strong></article><article><span>Dinheiro recebido · registros</span><strong>R$ {{ paid_total|floatformat:2 }}</strong></article></div><div class="panel-notice"><h3>Dados do seu estabelecimento</h3><p>Os indicadores refletem apenas os registros recebidos. Usuários online precisam de atualização nos últimos 5 minutos. O dinheiro das vendas é recebido pelo estabelecimento. Os registros não representam saldo da Nova Info nem valores de repasse.</p><p>Cadastros de equipamentos, planos, configurações e imagens estão disponíveis. Comunicação RouterOS, publicação do portal e recebimento de pagamentos ainda exigem integração; cadastrar um equipamento não o conecta automaticamente.</p>{% if not database_isolation %}<p><strong>Ambiente de desenvolvimento SQLite:</strong> os acessos são filtrados no backend. Para isolamento adicional no banco, esta versão exige PostgreSQL com as políticas RLS e uma credencial de aplicação sem privilégios de bypass.</p>{% endif %}</div>{% endblock %}

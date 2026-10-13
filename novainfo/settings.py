@@ -1,4 +1,5 @@
 import os
+import json
 from pathlib import Path
 
 
@@ -32,6 +33,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "tenants",
     "website",
+    "operations",
 ]
 
 MIDDLEWARE = [
@@ -63,15 +65,26 @@ TEMPLATES = [
 WSGI_APPLICATION = "novainfo.wsgi.application"
 ASGI_APPLICATION = "novainfo.asgi.application"
 
-if os.environ.get("DB_ENGINE", "sqlite").lower() == "postgres":
+# Only local development can load the private project-local database descriptor.
+local_database = {}
+local_database_file = BASE_DIR / '.local' / 'database.json'
+if DEBUG and local_database_file.is_file():
+    local_database = json.loads(local_database_file.read_text())
+
+
+def database_env(name, default):
+    return os.environ.get(name, local_database.get(name, default))
+
+
+if database_env("DB_ENGINE", "sqlite").lower() == "postgres":
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ.get("DB_NAME", "novainfo"),
-            "USER": os.environ.get("DB_USER", "novainfo"),
-            "PASSWORD": os.environ.get("DB_PASSWORD", ""),
-            "HOST": os.environ.get("DB_HOST", "localhost"),
-            "PORT": os.environ.get("DB_PORT", "5432"),
+            "NAME": database_env("DB_NAME", "novainfo"),
+            "USER": database_env("DB_USER", "novainfo"),
+            "PASSWORD": database_env("DB_PASSWORD", ""),
+            "HOST": database_env("DB_HOST", "localhost"),
+            "PORT": database_env("DB_PORT", "5432"),
             "CONN_MAX_AGE": 60,
         }
     }
@@ -108,3 +121,17 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+
+# Runtime credentials must not bypass PostgreSQL row policies.
+if not DEBUG and DATABASES['default']['ENGINE'] != 'django.db.backends.postgresql':
+    raise RuntimeError('Multi-tenant production requires PostgreSQL with RLS.')
+DATA_UPLOAD_MAX_MEMORY_SIZE = 3 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 2 * 1024 * 1024
+
+ROUTEROS_CREDENTIAL_KEY = os.environ.get('ROUTEROS_CREDENTIAL_KEY', '')
+local_credential_key = BASE_DIR / '.local' / 'routeros.key'
+if DEBUG and not ROUTEROS_CREDENTIAL_KEY and local_credential_key.is_file():
+    ROUTEROS_CREDENTIAL_KEY = local_credential_key.read_text().strip()
+WG_EXECUTABLE = os.environ.get('WG_EXECUTABLE', '/usr/bin/wg')
+WG_MONITOR_USER_ID = os.environ.get('WG_MONITOR_USER_ID', '')
+MONITOR_MAX_GAP_SECONDS = int(os.environ.get('MONITOR_MAX_GAP_SECONDS', '300'))

@@ -10,3 +10,13 @@ class LeadRequestAdmin(admin.ModelAdmin):
     search_fields = ("business_name", "name", "email", "phone")
     readonly_fields = ("created_at",)
     ordering = ("-created_at",)
+
+
+from website.models import SubscriptionPlan
+
+
+@admin.register(SubscriptionPlan)
+class SubscriptionPlanAdmin(admin.ModelAdmin):
+    list_display = ("name", "monthly_price", "is_active", "is_featured", "position")
+    list_editable = ("monthly_price", "is_active", "is_featured", "position")
+    search_fields = ("name", "description")

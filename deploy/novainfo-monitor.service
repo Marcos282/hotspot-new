@@ -1,0 +1,18 @@
+[Unit]
+Description=Nova Info - verificacao de VPN, RouterOS e Hotspot
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=novainfo-monitor
+WorkingDirectory=/var/www/html/novainfo/servidormk
+EnvironmentFile=/etc/novainfo/monitor.env
+ExecStart=/var/www/html/novainfo/servidormk/myenv/bin/python manage.py monitor_network
+# Ajuste com revisão: leitura de wg requer permissão restrita no host.
+# Nunca execute o servidor web como root.
+CapabilityBoundingSet=CAP_NET_ADMIN
+AmbientCapabilities=CAP_NET_ADMIN
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
