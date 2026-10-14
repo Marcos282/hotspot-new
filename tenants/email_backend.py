@@ -1,37 +1,27 @@
-"""Django email backend using the Resend HTTPS API."""
-import json
-from urllib.request import Request, urlopen
+"""Send transactional email through Resend SMTP over SSL."""
+import logging
 from django.conf import settings
-from django.core.mail.backends.base import BaseEmailBackend
+from django.core.mail.backends.smtp import EmailBackend as SMTPEmailBackend
 from django.core.exceptions import ImproperlyConfigured
 
 
-class EmailBackend(BaseEmailBackend):
+logger = logging.getLogger(__name__)
+
+
+class EmailBackend(SMTPEmailBackend):
     def send_messages(self, email_messages):
-        if not settings.RESEND_API_KEY or not settings.DEFAULT_FROM_EMAIL:
-            raise ImproperlyConfigured('Configure RESEND_API_KEY e RESEND_FROM_EMAIL.')
-        sent = 0
-        for message in email_messages:
-            if not message.recipients():
-                continue
-            payload = {'from': message.from_email, 'to': message.to,
-                       'subject': message.subject, 'text': message.body}
-            if message.cc:
-                payload['cc'] = message.cc
-            if message.bcc:
-                payload['bcc'] = message.bcc
-            request = Request('https://api.resend.com/emails',
-                              data=json.dumps(payload).encode(), method='POST',
-                              headers={'Authorization': f'Bearer {settings.RESEND_API_KEY}',
-                                       'Content-Type': 'application/json',
-                                       'User-Agent': 'NovaInfo/1.0'})
-            try:
-                with urlopen(request, timeout=15) as response:
-                    result = json.load(response)
-                if not result.get('id'):
-                    raise ValueError('Missing delivery ID')
-                sent += 1
-            except Exception:
-                if not self.fail_silently:
-                    raise RuntimeError('Não foi possível enviar o e-mail pelo Resend.') from None
-        return sent
+        if not email_messages:
+            return 0
+        if not self.password or not settings.DEFAULT_FROM_EMAIL:
+            if self.fail_silently:
+                return 0
+            raise ImproperlyConfigured('Configure EMAIL_HOST_PASSWORD e DEFAULT_FROM_EMAIL (ou RESEND_API_KEY e RESEND_FROM_EMAIL).')
+        try:
+            return super().send_messages(email_messages)
+        except Exception as error:
+            # Do not log SMTP response bodies, credentials or recipient addresses.
+            code = getattr(error, 'smtp_code', None)
+            logger.error('Falha no SMTP Resend: tipo=%s codigo=%s', type(error).__name__, code)
+            if self.fail_silently:
+                return 0
+            raise RuntimeError('Não foi possível enviar o e-mail pelo SMTP do Resend.') from None

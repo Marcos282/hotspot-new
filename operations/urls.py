@@ -1,10 +1,11 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView
+from tenants.account import EmailAuthenticationForm
 from operations import views
 
 app_name='operations'
 urlpatterns=[
-    path('login/',LoginView.as_view(template_name='operations/login.html',next_page='/central/'),name='login'),
+    path('login/',LoginView.as_view(authentication_form=EmailAuthenticationForm,template_name='operations/login.html',next_page='/central/'),name='login'),
     path('',views.dashboard,name='dashboard'),
     path('configuracoes/',views.configuration,name='configuration'),
     path('wireguard/',views.peers,name='peers'),

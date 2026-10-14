@@ -53,6 +53,6 @@ class AccountsPanelTests(TestCase):
         self.assertEqual(self.client.get('/accounts/painel/', HTTP_HOST='hotel.novainfo.com.br').status_code, 403)
 
     def test_customer_credentials_rejected_by_control_login(self):
-        response = self.client.post('/accounts/painel/login/', {'username': 'customer', 'password': 'Customer-strong-123!'}, **self.host)
+        response = self.client.post('/accounts/painel/login/', {'username': 'customer@example.com', 'password': 'Customer-strong-123!'}, **self.host)
         self.assertContains(response, 'não possui acesso')
         self.assertNotIn('_auth_user_id', self.client.session)

@@ -1,9 +1,11 @@
 import os
 import json
 from pathlib import Path
+from dotenv import load_dotenv
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env", override=False)
 DEBUG = os.environ.get("DJANGO_DEBUG", "true").lower() == "true"
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "development-only-change-me")
 if not DEBUG and (
@@ -138,13 +140,27 @@ MONITOR_MAX_GAP_SECONDS = int(os.environ.get('MONITOR_MAX_GAP_SECONDS', '300'))
 
 WG_STATUS_FILE = os.environ.get('WG_STATUS_FILE', '/var/lib/novainfo/wireguard-status.json')
 
-# Authentication emails: credentials belong in the service environment.
+# Authentication emails via Resend SMTP: credentials belong in the service environment.
 EMAIL_BACKEND = 'tenants.email_backend.EmailBackend'
-RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
-DEFAULT_FROM_EMAIL = os.environ.get('RESEND_FROM_EMAIL', '')
+def email_setting(name, default=''):
+    return os.environ.get(name, default)
+
+RESEND_API_KEY = email_setting('RESEND_API_KEY')
+EMAIL_HOST = email_setting('EMAIL_HOST', 'smtp.resend.com')
+EMAIL_PORT = int(email_setting('EMAIL_PORT', 465))
+EMAIL_HOST_USER = email_setting('EMAIL_HOST_USER', 'resend')
+EMAIL_HOST_PASSWORD = email_setting('EMAIL_HOST_PASSWORD', RESEND_API_KEY)
+EMAIL_USE_SSL = str(email_setting('EMAIL_USE_SSL', True)).lower() == 'true'
+EMAIL_USE_TLS = str(email_setting('EMAIL_USE_TLS', False)).lower() == 'true'
+if EMAIL_USE_SSL and EMAIL_USE_TLS:
+    raise RuntimeError('Configure somente EMAIL_USE_SSL ou EMAIL_USE_TLS.')
+EMAIL_TIMEOUT = int(email_setting('EMAIL_TIMEOUT', 15))
+DEFAULT_FROM_EMAIL = email_setting('DEFAULT_FROM_EMAIL', email_setting('RESEND_FROM_EMAIL'))
 PASSWORD_RESET_TIMEOUT = 3600
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_DOMAIN = None
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 3600
+
+AUTHENTICATION_BACKENDS = ['tenants.auth_backend.EmailBackend']

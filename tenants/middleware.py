@@ -50,6 +50,8 @@ class TenantMiddleware:
 
     def is_platform_host(self, request):
         host = urlsplit(f"//{request.get_host()}").hostname.lower().rstrip('.')
+        if settings.DEBUG and host.endswith('.localhost'):
+            return False
         return host == self.root_domain or not host.endswith('.'+self.root_domain) or host in {'www.'+self.root_domain,'gestao.'+self.root_domain,'admin.'+self.root_domain}
 
     def resolve_tenant(self, request):
@@ -60,7 +62,7 @@ class TenantMiddleware:
 
         if host == self.root_domain:
             return None
-        suffix = f".{self.root_domain}"
+        suffix = ".localhost" if settings.DEBUG and host.endswith(".localhost") else f".{self.root_domain}"
         if not host.endswith(suffix):
             return None
 

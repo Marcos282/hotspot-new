@@ -254,3 +254,14 @@ class AuditEvent(TenantOwnedModel):
     object_id = models.PositiveBigIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 
+
+
+class TenantRegistration(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tenant_registration')
+    name = models.CharField('estabelecimento', max_length=150)
+    responsible_name = models.CharField('nome do responsável', max_length=120, blank=True)
+    phone = models.CharField('telefone / WhatsApp', max_length=32, blank=True)
+    city = models.CharField('cidade', max_length=100, blank=True)
+    slug = models.CharField('subdomínio desejado', max_length=63, unique=True, validators=[tenant_slug_validator, validate_tenant_slug])
+    tenant = models.OneToOneField(Tenant, null=True, blank=True, on_delete=models.PROTECT)
+    created_at = models.DateTimeField(auto_now_add=True)

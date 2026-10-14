@@ -63,31 +63,44 @@ class AccountTests(TestCase):
 
     def test_login_attempts_are_limited(self):
         for _ in range(10):
-            response = self.client.post('/accounts/login/', {'username': 'member', 'password': 'wrong'}, **self.host)
+            response = self.client.post('/accounts/login/', {'username': 'member@example.com', 'password': 'wrong'}, **self.host)
             self.assertEqual(response.status_code, 200)
-        response = self.client.post('/accounts/login/', {'username': 'member', 'password': 'wrong'}, **self.host)
+        response = self.client.post('/accounts/login/', {'username': 'member@example.com', 'password': 'wrong'}, **self.host)
         self.assertEqual(response.status_code, 429)
 
 
-@override_settings(RESEND_API_KEY='test-key', DEFAULT_FROM_EMAIL='conta@example.com')
+@override_settings(EMAIL_HOST_PASSWORD='test-key', DEFAULT_FROM_EMAIL='conta@example.com')
 class ResendBackendTests(TestCase):
-    @patch('tenants.email_backend.urlopen')
-    def test_request_uses_resend_and_does_not_send_passwords(self, opener):
-        import io
-        import json
+    @patch('django.core.mail.backends.smtp.smtplib.SMTP_SSL')
+    def test_smtp_uses_ssl_and_sends_confirmation_without_password(self, smtp):
         from django.core.mail import EmailMessage
         from tenants.email_backend import EmailBackend
-        opener.return_value.__enter__.return_value = io.BytesIO(b'{"id":"message-id"}')
         message = EmailMessage('Recuperar senha', 'Link de redefinição', to=['member@example.com'])
         self.assertEqual(EmailBackend().send_messages([message]), 1)
-        request = opener.call_args.args[0]
-        self.assertEqual(request.full_url, 'https://api.resend.com/emails')
-        self.assertEqual(request.get_header('Authorization'), 'Bearer test-key')
-        self.assertEqual(json.loads(request.data)['to'], ['member@example.com'])
+        self.assertEqual(smtp.call_args.args, ('smtp.resend.com', 465))
+        self.assertEqual(smtp.call_args.kwargs['timeout'], 15)
+        smtp.return_value.login.assert_called_once_with('resend', 'test-key')
+        args = smtp.return_value.sendmail.call_args.args
+        self.assertEqual(args[1], ['member@example.com'])
+        self.assertIn(b'Link de redefini', args[2])
+        self.assertNotIn(b'test-key', args[2])
+        smtp.return_value.quit.assert_called_once()
 
-    @patch('tenants.email_backend.urlopen', side_effect=OSError('secret details'))
-    def test_delivery_error_is_sanitized(self, opener):
+    @patch('django.core.mail.backends.smtp.smtplib.SMTP_SSL', side_effect=OSError('secret details'))
+    def test_delivery_error_is_sanitized(self, smtp):
         from django.core.mail import EmailMessage
         from tenants.email_backend import EmailBackend
-        with self.assertRaisesRegex(RuntimeError, 'Resend'):
+        with self.assertRaisesRegex(RuntimeError, 'SMTP do Resend') as error:
             EmailBackend().send_messages([EmailMessage('Assunto', 'Texto', to=['member@example.com'])])
+        self.assertNotIn('secret details', str(error.exception))
+        self.assertEqual(EmailBackend(fail_silently=True).send_messages([EmailMessage('Assunto', 'Texto', to=['member@example.com'])]), 0)
+
+    @override_settings(EMAIL_HOST_PASSWORD='')
+    @patch('django.core.mail.backends.smtp.smtplib.SMTP_SSL')
+    def test_missing_credentials_do_not_open_connection(self, smtp):
+        from django.core.exceptions import ImproperlyConfigured
+        from django.core.mail import EmailMessage
+        from tenants.email_backend import EmailBackend
+        with self.assertRaises(ImproperlyConfigured):
+            EmailBackend().send_messages([EmailMessage('Assunto', 'Texto', to=['member@example.com'])])
+        smtp.assert_not_called()

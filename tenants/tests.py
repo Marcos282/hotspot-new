@@ -123,7 +123,8 @@ class TenantPanelTests(TenantIsolationTests):
 
     def test_root_account_redirects_to_tenant_login(self):
         response = self.client.post('/minha-conta/', {'slug': 'marcos'}, HTTP_HOST='novainfo.com.br')
-        self.assertEqual(response['Location'], 'http://marcos.novainfo.com.br/accounts/login/')
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('_auth_user_id', self.client.session)
         response = self.client.post('/minha-conta/', {'slug':'example.com/evil'}, HTTP_HOST='novainfo.com.br')
         self.assertEqual(response.status_code, 200)
 

@@ -18,8 +18,9 @@ ativo, staff e a permissão `operations.manage_network` (superusers já a possue
 Não há senha administrativa padrão. A permissão permite consultar e administrar
 os estabelecimentos; não a atribua a clientes.
 
-O botão **ACESSAR MINHA CONTA** abre `/minha-conta/` e direciona ao subdomínio
-informado. Crie estabelecimentos e associações na central; contas Django podem
+O botão **ACESSAR MINHA CONTA** abre `/minha-conta/`, solicita e-mail e senha
+e direciona ao painel autorizado sem novo login. Se houver vários estabelecimentos,
+o usuário escolhe o painel. A transferência usa um ticket de uso único de 60 segundos. Crie estabelecimentos e associações na central; contas Django podem
 ser criadas pelo Admin. Owner/admin editam seus cadastros e consultam logs;
 staff/viewer consultam dados comerciais, sem edição nem logs pessoais.
 Para testar `hotel.localhost:8001`, use `TENANT_ROOT_DOMAIN=localhost` e crie
@@ -286,8 +287,9 @@ O cadastro não permite reivindicar um tenant existente digitando seu subdomíni
 Configure `RESEND_API_KEY` e `RESEND_FROM_EMAIL` no ambiente do processo Django;
 o remetente deve pertencer a um domínio verificado no Resend. Reinicie o processo
 após configurar. Sem essas variáveis o envio não funciona; falhas no cadastro
-cancelam a criação da conta para permitir nova tentativa. Integração via
-[API oficial Resend](https://resend.com/docs/api-reference/emails/send-email).
+cancelam a criação da conta para permitir nova tentativa. Integração via [SMTP oficial Resend](https://resend.com/docs/send-with-smtp):
+`smtp.resend.com`, porta `465`, SSL, usuário `resend` e API key como senha.
+O Django usa essas configurações automaticamente, sem precisar de variáveis SMTP adicionais.
 
 `/accounts/recuperar/` envia um link de uso único, válido por uma hora, para
 contas ativas. No subdomínio, somente membros ativos desse estabelecimento
@@ -308,3 +310,40 @@ principal, com login em `/accounts/painel/login/`. Exige usuário ativo, staff e
 antes da ativação, permite escolher estabelecimento ativo e papel e registra
 quem aprovou na auditoria. Associações existentes são gerenciadas pelo link
 “Gerenciar acessos aprovados”. Clientes não acessam essa área.
+
+
+## Cadastro público de estabelecimentos
+
+O botão **Começar agora** abre `/registro/`. O responsável informa o negócio,
+telefone, cidade, subdomínio, login, e-mail e senha e confirma seu e-mail.
+Em `/accounts/painel/`, a administração usa **Aprovar e criar painel** para criar
+em uma transação o tenant, associação de proprietário, configurações e portal
+Hotspot inicial. O acesso passa a ser `https://<subdominio>.novainfo.com.br/painel/`.
+Cadastros antigos sem solicitação de tenant mantêm a aprovação por associação.
+A criação no banco não configura DNS ou certificados: DNS wildcard, roteamento
+para Django e TLS de `*.novainfo.com.br` precisam estar configurados no servidor.
+Aplicar a migration `tenants.0009` antes de disponibilizar este fluxo.
+No PostgreSQL com papéis separados, a credencial de migrations deve conceder à
+credencial da aplicação acesso à nova tabela e sequência (ajuste o papel):
+
+```sql
+GRANT SELECT, INSERT, UPDATE ON tenants_tenantregistration TO novainfo_app;
+GRANT USAGE, SELECT ON SEQUENCE tenants_tenantregistration_id_seq TO novainfo_app;
+```
+
+O Django carrega automaticamente o arquivo `.env` da raiz do projeto usando
+`python-dotenv`. O arquivo fica fora do Git e deve ter permissão `600`.
+Variáveis já definidas no ambiente do processo têm prioridade sobre o `.env`.
+
+A autenticação Django usa e-mail e senha, incluindo painel do tenant, central e
+Admin. O campo de cadastro Usuário continua identificando o endereço do negócio.
+Contas antigas precisam de um e-mail preenchido e exclusivo; e-mails duplicados
+são rejeitados no login. No desenvolvimento, acessar por `127.0.0.1:8001` ou
+`localhost:8001` direciona para `<tenant>.localhost:8001`. Cookies de sessão
+continuam restritos ao host de cada painel.
+
+As variáveis SMTP padrão `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`,
+`EMAIL_HOST_PASSWORD`, `EMAIL_USE_SSL`, `EMAIL_USE_TLS` e `DEFAULT_FROM_EMAIL`
+também são aceitas; veja `.env.example`. `EMAIL_HOST_PASSWORD` e
+`DEFAULT_FROM_EMAIL` têm prioridade sobre os aliases Resend. As mesmas chaves são aceitas no arquivo privado `.env` da raiz.
+O `.env.example` é apenas um modelo e não é carregado pelo Django.

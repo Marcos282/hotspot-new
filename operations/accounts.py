@@ -2,18 +2,20 @@
 from django import forms
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.core.exceptions import PermissionDenied
-from django.db import transaction
+from django.conf import settings
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.db import transaction, IntegrityError
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
-from tenants.account import AuthRateLimitMixin
+from tenants.account import AuthRateLimitMixin, EmailAuthenticationForm
 from django.contrib.auth.views import LoginView
-from tenants.models import Tenant, TenantMembership, AuditEvent
+from tenants.models import Tenant, TenantMembership, AuditEvent, TenantRegistration, TenantSettings, HotspotConfiguration
 from operations.views import central_access
 
 
 class ControlLoginView(AuthRateLimitMixin, LoginView):
+    authentication_form = EmailAuthenticationForm
     template_name = 'operations/login.html'
     next_page = '/accounts/painel/'
 
@@ -41,7 +43,7 @@ class ApprovalForm(forms.Form):
 
 @central_access
 def accounts_panel(request):
-    users = get_user_model().objects.filter(is_staff=False, tenant_memberships__isnull=True).order_by('-date_joined')
+    users = get_user_model().objects.filter(is_staff=False, tenant_memberships__isnull=True).select_related('tenant_registration').order_by('-date_joined')
     page = Paginator(users, 50).get_page(request.GET.get('page'))
     return render(request, 'operations/accounts.html', {'page_title': 'Controle de contas e aprovação', 'page_obj': page})
 
@@ -70,3 +72,31 @@ def approve_account(request, pk):
                     messages.success(request, f'Acesso de {user.get_username()} aprovado para {tenant.name}.')
                     return redirect('accounts-panel')
     return render(request, 'operations/approve_account.html', {'page_title': 'Aprovar acesso ao estabelecimento', 'account_user': user, 'form': form})
+
+
+@central_access
+@require_http_methods(['POST'])
+def approve_tenant_registration(request, pk):
+    try:
+        with transaction.atomic():
+            registration = get_object_or_404(TenantRegistration.objects.select_for_update().select_related('user'), pk=pk)
+            if registration.tenant_id:
+                messages.info(request, 'Este estabelecimento já foi aprovado.')
+            elif not registration.user.is_active:
+                messages.error(request, 'O responsável precisa confirmar o e-mail antes da aprovação.')
+            else:
+                tenant = Tenant.objects.create(
+                    name=registration.name, slug=registration.slug, email=registration.user.email,
+                    responsible_name=registration.responsible_name, phone=registration.phone, city=registration.city)
+                member = TenantMembership.objects.create(tenant=tenant, user=registration.user, role='owner')
+                TenantSettings.objects.create(tenant=tenant, display_name=tenant.name)
+                HotspotConfiguration.objects.create(tenant=tenant)
+                registration.tenant = tenant
+                registration.save(update_fields=['tenant'])
+                AuditEvent.objects.create(tenant=tenant, actor=request.user, action='aprovar cadastro tenant',
+                                          object_type='tenantmembership', object_id=member.pk,
+                                          fields_changed=['tenant', 'user', 'role', 'is_active'])
+                messages.success(request, f'Cadastro aprovado. Painel: https://{tenant.slug}.{settings.TENANT_ROOT_DOMAIN}/painel/')
+    except (IntegrityError, ValidationError):
+        messages.error(request, 'Não foi possível aprovar: o subdomínio pode já estar em uso. Revise os estabelecimentos.')
+    return redirect('accounts-panel')
