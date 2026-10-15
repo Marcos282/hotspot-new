@@ -1,3 +1,32 @@
+const solutionsMenu = document.querySelector(".solutions-menu");
+if (solutionsMenu) {
+  solutionsMenu.addEventListener("pointerenter", (event) => {
+    if (event.pointerType === "mouse") solutionsMenu.open = true;
+  });
+  solutionsMenu.addEventListener("pointerleave", (event) => {
+    if (event.pointerType === "mouse" && !solutionsMenu.contains(document.activeElement)) {
+      solutionsMenu.open = false;
+    }
+  });
+  solutionsMenu.addEventListener("focusout", (event) => {
+    if (!solutionsMenu.contains(event.relatedTarget) && !solutionsMenu.matches(":hover")) {
+      solutionsMenu.open = false;
+    }
+  });
+  document.addEventListener("click", (event) => {
+    if (!solutionsMenu.contains(event.target)) solutionsMenu.open = false;
+  });
+  solutionsMenu.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => { solutionsMenu.open = false; });
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && solutionsMenu.open) {
+      event.stopImmediatePropagation();
+      solutionsMenu.open = false;
+      solutionsMenu.querySelector("summary").focus();
+    }
+  });
+}
 const menuToggle = document.querySelector(".menu-toggle");
 const mainNav = document.querySelector(".main-nav");
 
@@ -7,6 +36,7 @@ if (menuToggle && mainNav) {
     menuToggle.setAttribute("aria-expanded", String(!isOpen));
     menuToggle.setAttribute("aria-label", isOpen ? "Abrir menu" : "Fechar menu");
     mainNav.classList.toggle("is-open", !isOpen);
+    if (isOpen && solutionsMenu) solutionsMenu.open = false;
   });
 
   mainNav.querySelectorAll("a").forEach((link) => {

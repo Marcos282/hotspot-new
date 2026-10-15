@@ -6,13 +6,16 @@ from operations.webhooks import subscription_webhook
 from operations.accounts import ControlLoginView, accounts_panel, approve_account, approve_tenant_registration
 from tenants.account import (EmailAdminAuthenticationForm, WorkspaceLoginView, AccountView, TenantLoginView, SignupView, TenantRegistrationView, ConfirmAccountView, TenantPasswordResetView)
 
-from website.views import HomeView, LeadRequestView, PlansView, PolicyView, robots, sitemap
+from website.views import HomeView, LeadRequestView, PlansView, PolicyView, ViaZapView, TaCombinadoView, NovaRedeView, robots, sitemap
 
 
 admin.site.login_form = EmailAdminAuthenticationForm
 
 urlpatterns = [
     path("", HomeView.as_view(), name="home"),
+    path("solucoes/novarede/", NovaRedeView.as_view(), name="novarede"),
+    path("solucoes/tacombinado/", TaCombinadoView.as_view(), name="tacombinado"),
+    path("solucoes/viazap/", ViaZapView.as_view(), name="viazap"),
     path("demonstracao/", LeadRequestView.as_view(), name="demo-request"),
     path("planos/", PlansView.as_view(), name="platform-plans"),
     path("privacidade/", PolicyView.as_view(extra_context={"kind": "privacy"}), name="privacy"),

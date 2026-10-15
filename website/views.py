@@ -10,6 +10,18 @@ class HomeView(TemplateView):
     template_name = "site/home.html"
 
 
+class NovaRedeView(TemplateView):
+    template_name = "site/novarede.html"
+
+
+class TaCombinadoView(TemplateView):
+    template_name = "site/tacombinado.html"
+
+
+class ViaZapView(TemplateView):
+    template_name = "site/viazap.html"
+
+
 class LeadRequestView(View):
     def post(self, request, *args, **kwargs):
         form = LeadRequestForm(request.POST)
