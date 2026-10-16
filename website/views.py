@@ -9,6 +9,11 @@ from website.forms import LeadRequestForm
 class HomeView(TemplateView):
     template_name = "site/home.html"
 
+    def get(self, request, *args, **kwargs):
+        if request.tenant:
+            return redirect('tenants:dashboard')
+        return super().get(request, *args, **kwargs)
+
 
 class NovaRedeView(TemplateView):
     template_name = "site/novarede.html"

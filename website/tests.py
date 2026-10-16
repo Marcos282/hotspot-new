@@ -6,6 +6,32 @@ from website.models import LeadRequest
 
 @override_settings(DEBUG=True)
 class PublicWebsiteTests(TestCase):
+    def test_tenant_home_opens_login_for_anonymous_visitors(self):
+        from tenants.models import Tenant
+        Tenant.objects.create(name='Nessa', slug='nessa')
+        response = self.client.get('/', HTTP_HOST='nessa.novainfo.com.br', follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.redirect_chain, [('/painel/', 302), ('/accounts/login/?next=/painel/', 302)])
+
+    def test_tenant_home_opens_dashboard_for_authorized_user(self):
+        from django.contrib.auth import get_user_model
+        from tenants.models import Tenant, TenantMembership
+        tenant = Tenant.objects.create(name='Nessa', slug='nessa')
+        user = get_user_model().objects.create_user('nessa', email='nessa@example.com')
+        TenantMembership.objects.create(tenant=tenant, user=user, role='owner')
+        self.client.force_login(user)
+        response = self.client.get('/', HTTP_HOST='nessa.novainfo.com.br', follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.redirect_chain, [('/painel/', 302)])
+
+    def test_tenant_home_preserves_membership_check(self):
+        from django.contrib.auth import get_user_model
+        from tenants.models import Tenant
+        Tenant.objects.create(name='Nessa', slug='nessa')
+        self.client.force_login(get_user_model().objects.create_user('other'))
+        response = self.client.get('/', HTTP_HOST='nessa.novainfo.com.br', follow=True)
+        self.assertEqual(response.status_code, 404)
+
     def test_homepage_shows_service_overview(self):
         response = self.client.get(reverse("home"))
         self.assertEqual(response.status_code, 200)
