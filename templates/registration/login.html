@@ -1,1 +1,56 @@
-{% extends 'site/base.html' %}{% load static %}{% block title %}Entrar — {{ request.tenant.name }}{% endblock %}{% block content %}<link rel="stylesheet" href="{% static 'site/panel.css' %}"><div class="account-card"><div class="eyebrow">{{ request.tenant.slug }} · NOVA INFO</div><h1>{{ request.tenant.name }}</h1><p>Entre com a conta autorizada para este estabelecimento.</p><form method="post">{% csrf_token %}{{ form.as_p }}<input type="hidden" name="next" value="{{ next }}"><button class="button button-primary">Entrar no meu painel →</button></form><p><a href="{% url 'account' %}">Acessar meu ambiente</a></p><p><a href="{% url 'signup' %}">Criar conta</a> · <a href="{% url 'password_reset' %}">Esqueci minha senha</a></p></div>{% endblock %}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Entrar | {{ request.tenant.name }}</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:#eef3f8;color:#173345;font-family:system-ui,sans-serif}
+main{display:grid;grid-template-columns:1fr 1fr;width:100%;max-width:900px;background:white;border-radius:26px;overflow:hidden;box-shadow:0 24px 80px #16344a18}
+.welcome{padding:55px 40px;background:radial-gradient(ellipse at top left,#287781,transparent 80%),#123845;color:white;display:flex;flex-direction:column;justify-content:center}
+.tag{text-transform:uppercase;letter-spacing:2px;font-size:11px;color:#aedbd8}
+h1{font-size:40px;line-height:1.15;letter-spacing:-1px;overflow-wrap:anywhere}
+.welcome p{color:#d0e5e8;line-height:1.8}
+.login{padding:55px 40px}
+h2{font-size:28px;margin:0 0 12px}
+.intro{color:#687e8b;font-size:14px;line-height:1.7}
+label{display:block;font-size:14px;font-weight:600;margin:22px 0 8px}
+input{width:100%;padding:14px;border:1px solid #ccd8df;border-radius:10px;background:#fbfcfd;font:inherit}
+input:focus-visible{outline:3px solid #91cfce;outline-offset:2px}
+button{width:100%;padding:16px;border:0;border-radius:10px;background:#185b64;color:white;font:inherit;font-weight:700;cursor:pointer;margin-top:22px}
+button:hover{background:#10464e}
+a{color:#216873;font-size:13px}
+.forgot{text-align:right;margin-top:15px}
+.note{font-size:12px;color:#738894;text-align:center;line-height:1.7;margin-top:24px}
+.errorlist{color:#a52b35;font-size:13px;line-height:1.6}
+@media(max-width:650px){main{grid-template-columns:1fr}.welcome,.login{padding:30px}.welcome h1{font-size:30px;margin:15px 0}.welcome p{margin-bottom:0}}
+</style>
+</head>
+<body>
+<main>
+<section class="welcome">
+<span class="tag">Seu espaço de gestão</span>
+<h1>{{ request.tenant.name }}</h1>
+<p>Tudo pronto para mais um dia.<br>Acesse seu painel e cuide do seu negócio em um só lugar.</p>
+</section>
+<section class="login">
+<h2>Que bom ter você aqui.</h2>
+<p class="intro">Entre com seu e-mail e senha para acessar o painel de {{ request.tenant.name }}.</p>
+<form method="post" action="{% url 'login' %}">
+{% csrf_token %}
+<div role="alert">{{ form.non_field_errors }}</div>
+<label for="{{ form.username.id_for_label }}">E-mail</label>
+{{ form.username }}{{ form.username.errors }}
+<label for="{{ form.password.id_for_label }}">Senha</label>
+{{ form.password }}{{ form.password.errors }}
+<input type="hidden" name="next" value="{{ next }}">
+<p class="forgot"><a href="{% url 'password_reset' %}">Esqueci minha senha</a></p>
+<button type="submit">Entrar no painel →</button>
+</form>
+<p class="note">Acesso exclusivo para contas autorizadas<br>neste estabelecimento.</p>
+</section>
+</main>
+</body>
+</html>

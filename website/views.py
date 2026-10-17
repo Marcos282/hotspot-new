@@ -11,7 +11,9 @@ class HomeView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         if request.tenant:
-            return redirect('tenants:dashboard')
+            if request.user.is_authenticated:
+                return redirect("tenants:dashboard")
+            return redirect("login")
         return super().get(request, *args, **kwargs)
 
 
