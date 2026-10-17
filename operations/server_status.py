@@ -5,7 +5,7 @@ from pathlib import Path
 from django.conf import settings
 
 
-def wireguard_server_status(config):
+def wireguard_server_status(config, *, require_configuration=True):
     result={'active':False,'label':'Aguardando instalação','detail':'WireGuard não encontrado no servidor.'}
     if not shutil.which(settings.WG_EXECUTABLE):
         return result
@@ -24,6 +24,11 @@ def wireguard_server_status(config):
         age=(datetime.now(timezone.utc)-checked).total_seconds()
         if age<0 or age>180:
             result['detail']='A última verificação expirou.'
+            return result
+        if not config and not require_configuration:
+            result.update(active=snapshot.get('active') is True,
+                          label='Ativo' if snapshot.get('active') is True else 'Inativo',
+                          detail='Estado do serviço e interface observado no servidor; conexões dos equipamentos são verificadas separadamente.')
             return result
         if not config:
             result.update(label='Aguardando configuração',detail='Cadastre a interface e a chave pública do servidor na central.')

@@ -1,0 +1,19 @@
+{% extends 'tenants/base.html' %}
+{% block panel %}
+<p><a class="button button-primary" href="{% url 'tenants:status' %}">Atualizar status</a></p>
+<section class="panel-notice">
+<h2>Servidor WireGuard · {{ wireguard_server.label }}</h2>
+<p>{{ wireguard_server.detail }}</p>
+<p>Última coleta: {{ wireguard_server.checked_at|date:'d/m/Y H:i:s T'|default:'Ainda não disponível' }}</p>
+{% with info=wireguard_server.observed %}
+{% if info %}
+<p>Interface: {{ info.interface|default:'Não informado' }} · IP: {{ info.addresses|join:', ' }} · Porta UDP: {{ info.port|default:'Não informado' }} · MTU: {{ info.mtu|default:'Não informado' }}</p>
+<p>Serviço: {{ info.service_state|default:'Não informado' }} / {{ info.service_substate|default:'Não informado' }} · Inicialização automática: {{ info.enabled|default:'Não informado' }}</p>
+<p>Ativo desde: {{ info.started_at|default:'Não informado' }}</p>
+{% endif %}
+{% endwith %}
+<p>O estado active / exited é esperado para o wg-quick. O serviço ativo não garante conexão com o seu roteador. Confira a VPN do equipamento abaixo.</p>
+</section>
+<h2>Equipamentos deste estabelecimento</h2>
+{% include 'operations/connections_table.html' %}
+{% endblock %}

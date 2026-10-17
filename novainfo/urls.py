@@ -1,3 +1,4 @@
+from operations.views import server_status
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
@@ -12,6 +13,8 @@ from website.views import HomeView, LeadRequestView, PlansView, PolicyView, ViaZ
 admin.site.login_form = EmailAdminAuthenticationForm
 
 urlpatterns = [
+    path("accounts/painel/status/", server_status, name="accounts-status"),
+    path("accounts/painel/status", server_status),
     path("", HomeView.as_view(), name="home"),
     path("solucoes/novarede/", NovaRedeView.as_view(), name="novarede"),
     path("solucoes/tacombinado/", TaCombinadoView.as_view(), name="tacombinado"),

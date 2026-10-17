@@ -3,9 +3,12 @@ from tenants.cash import CashSaleView
 from operations.subscription_views import SubscriptionView
 from tenants.views import TenantReportView, HotspotPreviewView, DashboardView, RecordsView, RecordEditView, HotspotView, ImagesView, ImageView
 
+from tenants.status import StatusView
+
 app_name = 'tenants'
 urlpatterns = [
     path('', DashboardView.as_view(), name='dashboard'),
+    path('status/', StatusView.as_view(), name='status'),
     path('vendas/dinheiro/', CashSaleView.as_view(), name='cash-sale'),
     path('assinatura/', SubscriptionView.as_view(), name='subscription'),
     path('relatorios/', TenantReportView.as_view(), name='reports'),
