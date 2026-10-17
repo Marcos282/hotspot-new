@@ -12,7 +12,15 @@ def wireguard_server_status(config):
     result.update(label='Sem confirmação',detail='Aguardando a verificação do serviço WireGuard.')
     try:
         snapshot=json.loads(Path(settings.WG_STATUS_FILE).read_text())
+        if not isinstance(snapshot, dict):
+            return result
         checked=datetime.fromisoformat(snapshot['checked_at'])
+        result['checked_at'] = checked
+        result['observed'] = {key: snapshot.get(key) for key in (
+            'interface', 'addresses', 'port', 'service_state', 'service_substate',
+            'enabled', 'started_at', 'mtu', 'interface_up', 'peer_count',
+            'recent_peer_count', 'received_bytes', 'sent_bytes', 'last_handshake',
+        )}
         age=(datetime.now(timezone.utc)-checked).total_seconds()
         if age<0 or age>180:
             result['detail']='A última verificação expirou.'
@@ -27,6 +35,6 @@ def wireguard_server_status(config):
             result.update(active=True,label='Ativo',detail='Serviço e interface verificados. Conexões dos equipamentos são mostradas separadamente.')
         else:
             result.update(label='Inativo',detail='A interface ou o serviço WireGuard não está ativo.')
-    except (OSError,ValueError,KeyError,TypeError):
+    except (OSError,ValueError,KeyError,TypeError,AttributeError):
         pass
     return result

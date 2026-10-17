@@ -1,0 +1,34 @@
+{% extends 'operations/base.html' %}
+{% block central %}
+<p><a class="button button-primary" href="{% url 'operations:status' %}">Atualizar status</a> <a href="{% url 'operations:configuration' %}">Configurações do servidor</a></p>
+<section class="panel-notice">
+<h2>WireGuard · {{ wireguard_server.label }}</h2>
+<p>{{ wireguard_server.detail }}</p>
+<p>Última coleta: {{ wireguard_server.checked_at|date:'d/m/Y H:i:s T'|default:'Ainda não disponível' }}. A coleta ocorre aproximadamente a cada minuto.</p>
+{% if wireguard_server.observed %}
+{% with info=wireguard_server.observed %}
+<div class="table-scroll"><table><tbody>
+<tr><th>Interface</th><td>{{ info.interface|default:'Não informado' }}</td></tr>
+<tr><th>Endereços VPN observados</th><td>{{ info.addresses|join:', '|default:'Não informado' }}</td></tr>
+<tr><th>Porta UDP</th><td>{{ info.port|default:'Não informado' }}</td></tr>
+<tr><th>Estado do serviço</th><td>{{ info.service_state|default:'Não informado' }} / {{ info.service_substate|default:'Não informado' }}</td></tr>
+<tr><th>Inicialização automática</th><td>{{ info.enabled|default:'Não informado' }}</td></tr>
+<tr><th>Serviço ativo desde</th><td>{{ info.started_at|default:'Não informado' }}</td></tr>
+<tr><th>MTU</th><td>{{ info.mtu|default:'Não informado' }}</td></tr>
+<tr><th>Peers na interface</th><td>{% if info.peer_count != None and info.peer_count != '' %}{{ info.peer_count }}{% else %}Não informado{% endif %}</td></tr>
+<tr><th>Peers com handshake nos últimos 3 minutos</th><td>{% if info.recent_peer_count != None and info.recent_peer_count != '' %}{{ info.recent_peer_count }}{% else %}Não informado{% endif %}</td></tr>
+<tr><th>Último handshake (UTC)</th><td>{{ info.last_handshake|default:'Nenhum informado' }}</td></tr>
+<tr><th>Tráfego recebido / enviado</th><td>{% if info.received_bytes != None and info.received_bytes != '' %}{{ info.received_bytes|filesizeformat }} / {{ info.sent_bytes|filesizeformat }}{% else %}Não informado{% endif %}</td></tr>
+</tbody></table></div>
+{% endwith %}
+{% endif %}
+<p><code>active / exited</code> é esperado para o wg-quick: ele configura a interface e encerra. Serviço ativo não confirma a conexão de todos os roteadores. Os contadores de tráfego são acumulados desde a criação dos peers na interface.</p>
+{% if not config %}<p>Cadastre a configuração do servidor para comparar a interface, IP, porta e chave pública observados com os valores esperados.</p>{% endif %}
+</section>
+<h2>Conexões dos equipamentos</h2>
+<p>VPN, API e Hotspot são verificados separadamente. Dados antigos não confirmam conexão atual.</p>
+{% include 'operations/connections_table.html' %}
+{% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">Anterior</a>{% endif %}
+<span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+{% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Próxima</a>{% endif %}
+{% endblock %}

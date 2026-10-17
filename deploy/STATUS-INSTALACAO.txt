@@ -1,0 +1,24 @@
+ATUALIZAÇÃO DO ITEM STATUS
+
+1. Extraia novainfo-status-atualizacao.tar.gz na pasta do projeto:
+   cd /var/www/html/novainfo
+   tar -xzf /caminho/novainfo-status-atualizacao.tar.gz
+
+2. Atualize SOMENTE o coletor existente (não reinstale a VPN):
+   sudo install -D -o root -g root -m 755 deploy/wireguard-status.py /usr/local/libexec/novainfo-wireguard-status
+   sudo systemctl start novainfo-wireguard-status.service
+   sudo systemctl enable --now novainfo-wireguard-status.timer
+
+3. Execute os testes:
+   myenv/bin/python manage.py test operations.test_server_status --noinput
+
+4. Reinicie o serviço que executa o Django, conforme sua instalação.
+   Esta atualização não exige migrations nem alterações no banco ou na VPN.
+
+5. Acesse https://novainfo.com.br/central/status/ com a conta administrativa.
+
+O coletor já existente usa wg0 e atualiza /var/lib/novainfo/wireguard-status.json.
+Se as unidades novainfo-wireguard-status.service/timer não existirem, consulte
+os modelos em deploy/install-wireguard.sh. Não execute o instalador completo
+em uma VPN já configurada. O processo web apenas lê o JSON; não precisa de sudo.
+Não são coletadas chaves privadas nem configurações completas da VPN.

@@ -252,3 +252,17 @@ def report_context(request,tenant=None):
 @central_access
 def reports(request):
     return render(request,'operations/reports.html',context(request,'Relatórios e disponibilidade',**report_context(request)))
+
+
+@central_access
+def server_status(request):
+    from operations.server_status import wireguard_server_status
+    config = NetworkConfiguration.objects.filter(pk=1).first()
+    devices = Device.objects.select_related('tenant', 'health').order_by('tenant__name', 'name')
+    page = Paginator(devices, 50).get_page(request.GET.get('page'))
+    response = render(request, 'operations/status.html', context(
+        request, 'Status', wireguard_server=wireguard_server_status(config),
+        config=config, states=[state(device) for device in page], page_obj=page,
+    ))
+    response['Cache-Control'] = 'no-store'
+    return response

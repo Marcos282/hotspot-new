@@ -7,6 +7,7 @@ app_name='operations'
 urlpatterns=[
     path('login/',LoginView.as_view(authentication_form=EmailAuthenticationForm,template_name='operations/login.html',next_page='/central/'),name='login'),
     path('',views.dashboard,name='dashboard'),
+    path('status/',views.server_status,name='status'),
     path('configuracoes/',views.configuration,name='configuration'),
     path('wireguard/',views.peers,name='peers'),
     path('wireguard/novo/',views.peer_create,name='peer-create'),
