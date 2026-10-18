@@ -13,23 +13,17 @@ class DeviceForm(forms.ModelForm):
 
 
 
-from tenants.panel_forms import PriceField
+from tenants.panel_forms import PriceField, SpeedLimitField
 
 
 class AccessPlanForm(forms.ModelForm):
     price = PriceField()
-    speed_limit = forms.CharField(label='Limite de velocidade', required=False, max_length=32, help_text='Opcional. Exemplo: 5M/10M. Aplicado ao criar um acesso no MikroTik.')
+    speed_limit = SpeedLimitField()
     duration_minutes = forms.TypedChoiceField(label='Duração do acesso', coerce=int, choices=[(60,'1 hora'),(180,'3 horas'),(360,'6 horas')])
     class Meta:
         model = AccessPlan
         fields = ['name', 'duration_minutes', 'price', 'speed_limit', 'enabled']
 
-    def clean_speed_limit(self):
-        import re
-        value = self.cleaned_data['speed_limit']
-        if value and not re.fullmatch(r'[1-9][0-9]*[kM]?/[1-9][0-9]*[kM]?', value):
-            raise forms.ValidationError('Use um limite como 5M/10M.')
-        return value
 
 
 class HotspotForm(forms.ModelForm):

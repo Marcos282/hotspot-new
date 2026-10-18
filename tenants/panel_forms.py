@@ -32,6 +32,46 @@ class PriceField(forms.DecimalField):
         return super().to_python(value)
 
 
+class SpeedLimitField(forms.CharField):
+    def __init__(self, **kwargs):
+        kwargs.setdefault('label', 'Velocidade em Mbps (opcional)')
+        kwargs.setdefault('required', False)
+        kwargs.setdefault('max_length', 64)
+        kwargs.setdefault('help_text', 'Digite apenas o número, como 10. Para velocidades diferentes, use 5/10. Deixe vazio ou digite 0 para não limitar.')
+        kwargs.setdefault('widget', forms.TextInput(attrs={'placeholder': 'Ex.: 10', 'autocomplete': 'off', 'inputmode': 'decimal'}))
+        super().__init__(**kwargs)
+
+    def to_python(self, value):
+        value=super().to_python(value)
+        if not value:
+            return ''
+        value=re.sub(r'\s+','',value).lower()
+        value=re.sub(r'([kmg])(?:bits?|b)(?:/s|ps)?',r'\1',value)
+        parts=value.split('/')
+        if len(parts) not in (1,2):
+            raise forms.ValidationError('Informe uma velocidade numérica, como 10 ou 5/10.')
+        normalized=[]
+        for part in parts:
+            match=re.fullmatch(r'(\d{1,12}(?:[.,]\d{1,6})?)([kmg]|bps)?',part)
+            if not match:
+                raise forms.ValidationError('Informe uma velocidade numérica, como 10 ou 5/10.')
+            number=Decimal(match[1].replace(',','.'))
+            multiplier={'k':1000,'m':1000000,'g':1000000000,'bps':1,None:1000000}[match[2]]
+            bits=number*multiplier
+            if bits != bits.to_integral_value():
+                raise forms.ValidationError('A velocidade precisa representar pelo menos um bit por segundo.')
+            bits=int(bits)
+            if bits and bits % 1000000 == 0:
+                normalized.append(str(bits // 1000000)+'M')
+            elif bits and bits % 1000 == 0:
+                normalized.append(str(bits // 1000)+'k')
+            else:
+                normalized.append(str(bits))
+        if len(normalized)==1:
+            normalized*=2
+        return '' if normalized==['0','0'] else '/'.join(normalized)
+
+
 class HotspotAccessForm(forms.Form):
     guest_name = forms.CharField(label='Nome do cliente', max_length=100)
     username = forms.RegexField(label='Usuário do Hotspot', regex=r'\A[A-Za-z0-9][A-Za-z0-9._-]{2,39}\Z', max_length=40,
