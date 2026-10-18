@@ -153,10 +153,10 @@ class TenantPanelTests(TenantIsolationTests):
         response = self.client.get('/painel/online/', HTTP_HOST='restaurante-a.novainfo.com.br')
         self.assertNotContains(response,'stale')
 
-    def test_negative_price_and_public_management_ip_are_rejected(self):
+    def test_negative_price_is_rejected_and_valid_public_ip_is_accepted(self):
         from tenants.forms import AccessPlanForm, DeviceForm
         self.assertFalse(AccessPlanForm({'name':'X','duration_minutes':0,'price':-1}).is_valid())
-        self.assertFalse(DeviceForm({'name':'X','management_ip':'8.8.8.8'}).is_valid())
+        self.assertTrue(DeviceForm({'name':'X','management_ip':'8.8.8.8'}).is_valid())
 
 
 from unittest import skipUnless

@@ -19,10 +19,10 @@ def allowed_management_ip(value):
         return False
 
 
-class PrivateManagementIPField(forms.GenericIPAddressField):
+class ManagementIPField(forms.GenericIPAddressField):
     def __init__(self, **kwargs):
-        kwargs.setdefault('label', 'Endereço IP privado do equipamento')
-        kwargs.setdefault('help_text', 'Aceita IP privado IPv4 ou IPv6, inclusive CGNAT. Ex.: 192.168.1.1 ou 10.20.30.1/24. A máscara é removida ao salvar.')
+        kwargs.setdefault('label', 'Endereço IP do equipamento')
+        kwargs.setdefault('help_text', 'Aceita qualquer IPv4 ou IPv6 válido, público ou privado. Você também pode informar a máscara, como 192.168.1.1/24; somente o IP será salvo.')
         kwargs.setdefault('widget', forms.TextInput(attrs={'placeholder':'192.168.1.1', 'autocomplete':'off', 'spellcheck':'false'}))
         super().__init__(**kwargs)
 
@@ -38,8 +38,3 @@ class PrivateManagementIPField(forms.GenericIPAddressField):
             except ValueError:
                 raise forms.ValidationError('Informe um IP válido, como 192.168.1.1 ou 10.20.30.1/24.') from None
         return super().to_python(value)
-
-    def validate(self, value):
-        super().validate(value)
-        if value and not allowed_management_ip(value):
-            raise forms.ValidationError('Use um IP privado: 10.x.x.x, 172.16–31.x.x, 192.168.x.x, 100.64–127.x.x ou IPv6 fc00::/7.')

@@ -69,7 +69,7 @@ class RecordsView(TenantAccessMixin, TemplateView):
         from django.core.paginator import Paginator
         page = Paginator(query, 50).get_page(self.request.GET.get('page'))
         columns = {
-            'equipamentos': [('name','Nome'),('management_ip','IP privado'),('routeros_version','RouterOS'),('enabled','Habilitado'),('last_seen','Última comunicação')],
+            'equipamentos': [('name','Nome'),('management_ip','Endereço IP'),('routeros_version','RouterOS'),('enabled','Habilitado'),('last_seen','Última comunicação')],
             'planos': [('name','Plano'),('duration_minutes','Minutos'),('price','Valor (R$)'),('speed_limit','Velocidade'),('enabled','Ativo')],
             'vendas': [('reference','Referência'),('duration_minutes','Minutos vendidos'),('amount','Valor (R$)'),('status','Situação'),('created_at','Data')],
             'pagamentos': [('provider_reference','Referência'),('get_method_display','Forma'),('amount','Valor (R$)'),('status','Situação'),('received_by','Registrado por'),('received_at','Recebido em')],

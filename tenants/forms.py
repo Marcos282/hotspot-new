@@ -2,11 +2,11 @@ import struct
 import zlib
 from django import forms
 from tenants.models import Device, AccessPlan, HotspotConfiguration
-from tenants.ipaddressing import PrivateManagementIPField
+from tenants.ipaddressing import ManagementIPField
 
 
 class DeviceForm(forms.ModelForm):
-    management_ip = PrivateManagementIPField()
+    management_ip = ManagementIPField()
     class Meta:
         model = Device
         fields = ['name', 'management_ip', 'routeros_version', 'enabled']
