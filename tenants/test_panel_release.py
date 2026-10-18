@@ -156,3 +156,19 @@ class PanelReleaseTests(TestCase):
         finally:
             with connection.cursor() as cursor:
                 cursor.execute('RESET ROLE')
+
+
+    def test_centrally_registered_device_visible_only_to_its_tenant(self):
+        response=self.get('/painel/')
+        self.assertContains(response,'MikroTik do estabelecimento')
+        self.assertContains(response,'Router A')
+        self.assertContains(response,'10.77.0.2')
+        self.assertNotContains(response,'SECRET ROUTER B')
+        self.assertNotContains(response,'10.77.0.3')
+        response=self.get('/painel/equipamentos/')
+        self.assertContains(response,'Router A')
+        self.assertNotContains(response,'SECRET ROUTER B')
+        response=self.get('/painel/criar-acesso/')
+        self.assertEqual(response.context['form'].initial['device'],self.device.pk)
+        self.assertContains(response,'Router A')
+        self.assertNotContains(response,'SECRET ROUTER B')

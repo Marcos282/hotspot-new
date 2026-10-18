@@ -45,6 +45,7 @@ class DashboardView(TenantAccessMixin, TemplateView):
         tenant = self.request.tenant
         context.update(tenant=tenant, page_title='Visão geral', membership=membership(self.request))
         context['device_count'] = Device.objects.for_tenant(tenant).count()
+        context['tenant_devices'] = list(Device.objects.for_tenant(tenant).order_by('name').values('id','name','management_ip','enabled')[:20])
         context['plan_count'] = AccessPlan.objects.for_tenant(tenant).count()
         context['online_count'] = AccessSession.objects.for_tenant(tenant).filter(ended_at__isnull=True, last_seen__gte=timezone.now()-timedelta(minutes=5)).count()
         context['paid_total'] = Payment.objects.for_tenant(tenant).filter(method='cash',status='paid').aggregate(value=Sum('amount'))['value'] or 0
