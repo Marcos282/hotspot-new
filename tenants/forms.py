@@ -19,7 +19,13 @@ class DeviceForm(forms.ModelForm):
         return value
 
 
+from tenants.panel_forms import PriceField
+
+
 class AccessPlanForm(forms.ModelForm):
+    price = PriceField()
+    speed_limit = forms.CharField(label='Limite de velocidade', required=False, max_length=32, help_text='Opcional. Exemplo: 5M/10M. Aplicado ao criar um acesso no MikroTik.')
+    duration_minutes = forms.TypedChoiceField(label='Duração do acesso', coerce=int, choices=[(60,'1 hora'),(180,'3 horas'),(360,'6 horas')])
     class Meta:
         model = AccessPlan
         fields = ['name', 'duration_minutes', 'price', 'speed_limit', 'enabled']

@@ -265,3 +265,25 @@ class TenantRegistration(models.Model):
     slug = models.CharField('subdomínio desejado', max_length=63, unique=True, validators=[tenant_slug_validator, validate_tenant_slug])
     tenant = models.OneToOneField(Tenant, null=True, blank=True, on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class HotspotAccess(TenantOwnedModel):
+    device = models.ForeignKey(Device, on_delete=models.PROTECT)
+    plan = models.ForeignKey(AccessPlan, on_delete=models.PROTECT)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    guest_name = models.CharField(max_length=100)
+    username = models.CharField(max_length=40)
+    encrypted_password = models.TextField()
+    devices = models.PositiveSmallIntegerField()
+    duration_minutes = models.PositiveIntegerField()
+    request_id = models.UUIDField()
+    status = models.CharField(max_length=12, default='pending', choices=[('pending','Em criação'),('active','Criado'),('uncertain','Requer conferência')])
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['tenant','request_id'], name='hotspot_access_request_unique'),
+            models.UniqueConstraint(fields=['device','username'], name='hotspot_access_device_user_unique'),
+            models.CheckConstraint(condition=models.Q(devices__gte=1,devices__lte=6), name='hotspot_access_devices_1_6'),
+            models.CheckConstraint(condition=models.Q(duration_minutes__in=[60,180,360]), name='hotspot_access_duration_choices'),
+        ]

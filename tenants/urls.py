@@ -4,9 +4,14 @@ from operations.subscription_views import SubscriptionView
 from tenants.views import TenantReportView, HotspotPreviewView, DashboardView, RecordsView, RecordEditView, HotspotView, ImagesView, ImageView
 
 from tenants.status import StatusView
+from tenants.panel_views import CreateHotspotAccessView, OnlineUsersView, MyAccountView
 
 app_name = 'tenants'
 urlpatterns = [
+    path('criar-acesso/', CreateHotspotAccessView.as_view(), name='create-access'),
+    path('usuarios-online/', OnlineUsersView.as_view(), name='online'),
+    path('online/', OnlineUsersView.as_view(), name='legacy-online'),
+    path('minha-conta/', MyAccountView.as_view(), name='my-account'),
     path('', DashboardView.as_view(), name='dashboard'),
     path('status/', StatusView.as_view(), name='status'),
     path('vendas/dinheiro/', CashSaleView.as_view(), name='cash-sale'),

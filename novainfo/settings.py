@@ -166,3 +166,7 @@ SESSION_COOKIE_AGE = 3600
 
 AUTHENTICATION_BACKENDS = ['tenants.auth_backend.EmailBackend']
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Gunicorn listens on loopback; Nginx replaces this header at the HTTPS edge.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+HOTSPOT_WIREGUARD_INTERFACE = os.environ.get('HOTSPOT_WIREGUARD_INTERFACE', 'wg0')
