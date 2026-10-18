@@ -1,22 +1,16 @@
-import ipaddress
 import struct
 import zlib
 from django import forms
 from tenants.models import Device, AccessPlan, HotspotConfiguration
+from tenants.ipaddressing import PrivateManagementIPField
 
 
 class DeviceForm(forms.ModelForm):
+    management_ip = PrivateManagementIPField()
     class Meta:
         model = Device
         fields = ['name', 'management_ip', 'routeros_version', 'enabled']
 
-    def clean_management_ip(self):
-        value = self.cleaned_data['management_ip']
-        ip = ipaddress.ip_address(value)
-        networks = ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', 'fc00::/7']
-        if not any(ip in ipaddress.ip_network(network) for network in networks):
-            raise forms.ValidationError('Informe um IP privado da rede ou VPN.')
-        return value
 
 
 from tenants.panel_forms import PriceField

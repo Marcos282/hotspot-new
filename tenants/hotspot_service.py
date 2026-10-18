@@ -1,11 +1,11 @@
 import hashlib
-import ipaddress
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError, transaction
 from operations.routeros import RouterOSClient, RouterOSError
 from operations.security import encrypt_secret, decrypt_secret
 from tenants.models import HotspotAccess, AuditEvent, AccessPlan, Device
+from tenants.ipaddressing import allowed_management_ip
 
 
 class HotspotClient(RouterOSClient):
@@ -36,8 +36,7 @@ def connected_client(device):
     peer = getattr(device, 'vpn_peer', None)
     if not device.enabled or not peer or not peer.enabled or device.management_ip != peer.vpn_ip:
         raise RouterOSError('MikroTik desconectado ou sem vínculo WireGuard autorizado.')
-    ip = ipaddress.ip_address(device.management_ip)
-    if not ip.is_private or ip.is_loopback or ip.is_link_local:
+    if not allowed_management_ip(device.management_ip):
         raise RouterOSError('IP do túnel inválido.')
     return HotspotClient(device, getattr(settings,'HOTSPOT_WIREGUARD_INTERFACE','wg0'))
 
